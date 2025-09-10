@@ -1,0 +1,11 @@
+---
+- name: Перезапуск службы c-agent
+  hosts: target_machines
+  become: yes
+
+  tasks:
+    - name: Перезапустить службу c-agent
+      ansible.builtin.service:
+        name: c-agent
+        state: restarted
+        enabled: yes

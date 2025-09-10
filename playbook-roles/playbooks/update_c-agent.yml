@@ -1,0 +1,8 @@
+---
+- name: Обновление c-agent
+  hosts: target_machines
+  become: yes
+
+  roles:
+    - role: c_agent_updater
+      tags: c_agent_update

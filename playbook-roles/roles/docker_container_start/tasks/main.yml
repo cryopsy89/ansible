@@ -1,0 +1,5 @@
+- name: Запустить контейнер
+  shell: docker start {{ container_name }}
+  register: start_output
+  changed_when: "'already running' not in start_output.stdout"
+  tags: start

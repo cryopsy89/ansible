@@ -1,0 +1,10 @@
+- name: Показать список контейнеров
+  shell: docker ps -a
+  register: docker_ps_output
+  tags: list
+
+- name: Показать вывод docker ps
+  debug:
+    msg: "{{ docker_ps_output.stdout_lines }}"
+  when: docker_ps_output is defined
+  tags: list

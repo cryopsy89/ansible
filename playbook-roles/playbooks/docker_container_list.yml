@@ -1,0 +1,7 @@
+---
+- name: Получение списка контейнеров Docker
+  hosts: target_machines
+  become: true
+  gather_facts: false
+  roles:
+    - docker_container_list

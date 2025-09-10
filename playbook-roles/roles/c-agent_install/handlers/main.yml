@@ -1,0 +1,5 @@
+---
+- name: restart c-agent
+  ansible.builtin.service:
+    name: c-agent
+    state: restarted

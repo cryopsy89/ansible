@@ -1,0 +1,12 @@
+---
+- name: Install software on RHEL/CentOS
+  yum:
+    name: "{{ software_packages }}"
+    state: "{{ software_state }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Install software on SUSE
+  zypper:
+    name: "{{ software_packages }}"
+    state: "{{ software_state }}"
+  when: ansible_os_family == "Suse"

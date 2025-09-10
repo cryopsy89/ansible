@@ -1,0 +1,60 @@
+---
+- name: Проверка установленного c-agent
+  ansible.builtin.command: rpm -q c-agent
+  register: agent_check
+  ignore_errors: yes
+  changed_when: false
+  tags: check_install
+
+- name: Установка c-agent (только если не установлен)
+  block:
+    - name: Копируем c-agent на целевую машину
+      ansible.builtin.copy:
+        src: "{{ agent_rpm_src }}"
+        dest: "{{ agent_rpm_dest }}"
+        mode: '0644'
+      tags: install
+
+    - name: Устанавливаем rpm пакет с игнорированием подписи
+      ansible.builtin.command:
+        cmd: rpm -i --nosignature {{ agent_rpm_dest }}
+      register: rpm_install
+      ignore_errors: yes
+      tags: install
+
+    - name: Копируем конфигурационный файл
+      ansible.builtin.copy:
+        src: "{{ agent_config_src }}"
+        dest: "{{ agent_config_dest }}"
+        owner: c-agent
+        group: c-agent
+        mode: '0644'
+      notify: restart c-agent
+      tags: config
+
+    - name: Проверяем доступность службы
+      ansible.builtin.systemd:
+        name: c-agent
+        enabled: no
+        state: stopped
+      register: service_check
+      changed_when: false
+      check_mode: yes
+      tags: service
+
+    - name: Запускаем службу
+      ansible.builtin.service:
+        name: c-agent
+        state: started
+        enabled: yes
+      when: service_check is not skipped
+      tags: service
+  when: agent_check.rc != 0
+  tags: installation
+
+- name: Сообщение если агент уже установлен
+  ansible.builtin.debug:
+    msg: "c-agent уже установлен (версия: {{ agent_check.stdout }})"
+  when: agent_check.rc == 0
+  tags: check_install
+

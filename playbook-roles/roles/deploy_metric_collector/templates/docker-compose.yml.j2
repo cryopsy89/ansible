@@ -1,0 +1,153 @@
+version: "3.5"
+
+services:
+  metric-collector:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/metric-collector:{{ image_tag }}
+    ports:
+      - "{{ http_api_port }}:{{ http_api_port }}"
+      - "{{ agent_port }}:{{ agent_port }}"
+    env_file: .env
+    networks:
+      - metrics_network
+    restart: always
+    volumes:
+       - ./certs:/certs
+       - ./cache.db:/cache.db
+{% if http_agent.enabled %}
+  http-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/http-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ http_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if icmp_agent.enabled %}
+  icmp-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/icmp-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ icmp_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if ipmi_agent.enabled %}
+  ipmi-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/ipmi-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ ipmi_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if jmx_agent.enabled %}
+  jmx-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/jmx-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ jmx_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if kube_agent.enabled %}
+  kube-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/kube-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ kube_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if odbc_agent.enabled %}
+  odbc-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/odbc-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ odbc_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if opensearch_agent.enabled %}
+  opensearch-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/opensearch-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ opensearch_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if prometheus_agent.enabled %}
+  prometheus-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/prometheus-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ prometheus_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if snmp_agent.enabled %}
+  snmp-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/snmp-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ snmp_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if snmp_trap_agent.enabled %}
+  snmp-trap-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/snmp-trap-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ snmp_trap_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if ssh_agent.enabled %}
+  ssh-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/ssh-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ ssh_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+{% if vmware_agent.enabled %}
+  vmware-agent:
+    image: registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd/vmware-agent:{{ image_tag }}
+    deploy:
+      replicas: {{ vmware_agent.replicas }}
+    env_file: .env
+    depends_on:
+      - metric-collector
+    networks:
+      - metrics_network
+{% endif %}
+networks:
+  metrics_network: {}
+
+volumes:
+  certs:
+

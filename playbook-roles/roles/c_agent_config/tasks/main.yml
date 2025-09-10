@@ -1,0 +1,32 @@
+---
+- name: Остановка службы c-agent
+  ansible.builtin.service:
+    name: "{{ c_agent_service_name }}"
+    state: stopped
+  tags: service
+
+- name: Удаление старого конфига (гарантированная замена)
+  ansible.builtin.file:
+    path: "{{ c_agent_config_dest }}"
+    state: absent
+  ignore_errors: yes
+  tags: config_cleanup
+
+- name: Копирование новой конфигурации с заменой
+  ansible.builtin.copy:
+    src: "{{ c_agent_config_src }}"
+    dest: "{{ c_agent_config_dest }}"
+    owner: "{{ c_agent_user }}"
+    group: "{{ c_agent_group }}"
+    mode: '0644'
+    force: yes
+    backup: yes 
+  notify: restart c-agent
+  tags: config
+
+- name: Запуск службы
+  ansible.builtin.service:
+    name: "{{ c_agent_service_name }}"
+    state: started
+    enabled: yes
+  tags: service

@@ -1,0 +1,10 @@
+---
+- name: Остановка службы c-agent
+  hosts: target_machines
+  become: yes
+
+  tasks:
+    - name: Остановить службу c-agent
+      ansible.builtin.service:
+        name: c-agent
+        state: stopped

@@ -1,0 +1,7 @@
+---
+c_agent_service_name: c-agent
+c_agent_user: c-agent
+c_agent_group: c-agent
+c_agent_config_src: files/agent-config.json
+c_agent_config_dest: /opt/c-agent/agent-config.json
+c_agent_config_backup: yes

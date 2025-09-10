@@ -1,0 +1,7 @@
+---
+- name: Random Service Deploy
+  hosts: all
+  become: yes
+  roles:
+    - role: service_deploy
+      

@@ -1,0 +1,32 @@
+---
+- name: Ensure project directory exists
+  file:
+    path: "{{ deploy_base_path }}/metric-collector-{{ project_name }}"
+    state: directory
+
+- name: Create cache.db file
+  file:
+    path: "{{ deploy_base_path }}/metric-collector-{{ project_name }}/cache.db"
+    state: touch
+
+- name: Deploy .env file
+  template:
+    src: .env.j2
+    dest: "{{ deploy_base_path }}/metric-collector-{{ project_name }}/.env"
+
+- name: Deploy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ deploy_base_path }}/metric-collector-{{ project_name }}/docker-compose.yml"
+
+- name: Log into private registry
+  shell:
+    cmd: docker login --username test --password CRswdkkCQxE_FFX3hMEH registry-prod-git.mos.ru/technical-solution/pm/ais-pm-c-view-ci-cd
+    chdir: "{{ deploy_base_path }}/metric-collector-{{ project_name }}"
+
+- name: Pull and deploy Docker Compose project
+  command: docker compose up -d
+  args:
+    chdir: "{{ deploy_base_path }}/metric-collector-{{ project_name }}"
+
+

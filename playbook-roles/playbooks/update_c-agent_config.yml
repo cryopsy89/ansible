@@ -1,0 +1,7 @@
+---
+- name: Обновление конфигурации c-agent
+  hosts: target_machines
+  become: yes
+
+  roles:
+    - role: c_agent_config

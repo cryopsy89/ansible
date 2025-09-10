@@ -1,0 +1,65 @@
+# Каталог, где будут размещены проекты
+deploy_base_path: /opt
+image_tag: ngm_25.2.0
+
+# Имя проекта (например, project) из него будет сфомировано название директории metric-collector-epp и UID или AMQP_AGENT_ID в env файле
+project_name: cod_proxy
+project_id: 85
+http_api_port: 38108
+agent_port: 38109
+amqp_uri: amqp://ngm:qtgesdh45yhd32323WEGssspo@10.206.169.24:5672
+log_level: info
+http_api_host: 10.206.169.24
+metric_collector_ip: metric-collector
+metric_collector_port: 50051
+
+etcd_endpoints: pm-ngm1p.passport.local:2379
+
+
+http_agent:
+  enabled: true
+  replicas: 1
+
+icmp_agent:
+  enabled: true
+  replicas: 1
+
+ipmi_agent:
+  enabled: false
+  replicas: 1
+
+jmx_agent:
+  enabled: false
+  replicas: 1
+
+kube_agent:
+  enabled: false
+  replicas: 1
+
+odbc_agent:
+  enabled: false
+  replicas: 1
+
+opensearch_agent:
+  enabled: false
+  replicas: 1
+
+prometheus_agent:
+  enabled: true
+  replicas: 1
+
+snmp_agent:
+  enabled: false
+  replicas: 1
+snmp_trap_agent:
+  enabled: false
+  replicas: 1
+
+ssh_agent:
+  enabled: false
+  replicas: 1
+
+vmware_agent:
+  enabled: false
+  replicas: 1
+

@@ -1,0 +1,29 @@
+- name: Показать список контейнеров
+  shell: docker ps -a
+  register: docker_ps_output
+  tags: list
+
+- name: Показать вывод docker ps
+  debug:
+    msg: "{{ docker_ps_output.stdout_lines }}"
+  when: docker_ps_output is defined
+  tags: list
+
+- name: Запустить контейнер
+  shell: docker start {{ container_name }}
+  register: start_output
+  changed_when: "'already running' not in start_output.stdout"
+  tags: start
+
+- name: Остановить контейнер
+  shell: docker stop {{ container_name }}
+  register: stop_output
+  changed_when: "'is not running' not in stop_output.stdout"
+  tags: stop
+
+- name: Перезапустить контейнер
+  shell: docker restart {{ container_name }}
+  register: restart_output
+  changed_when: "'Restarted' in restart_output.stdout"
+  tags: restart
+

@@ -1,0 +1,7 @@
+---
+- name: Управление Docker-контейнерами
+  hosts: target_machines
+  become: true
+  gather_facts: false
+  roles:
+    - interactive_docker

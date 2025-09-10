@@ -1,0 +1,6 @@
+agent_rpm_src: /etc/ansible/roles/c_agent_updater/files/c-agent-25.2.0-1.x86_64.rpm
+agent_rpm_dest: /tmp/c-agent.rpm
+c_agent_config_src: files/agent-config.json
+c_agent_config_dest: /opt/c-agent/agent-config.json
+c_agent_user: c-agent
+c_agent_group: c-agent

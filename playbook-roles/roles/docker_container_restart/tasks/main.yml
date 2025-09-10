@@ -1,0 +1,5 @@
+- name: Перезапустить контейнер
+  shell: docker restart {{ container_name }}
+  register: restart_output
+  changed_when: "'Restarted' in restart_output.stdout"
+  tags: restart

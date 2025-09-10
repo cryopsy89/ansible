@@ -1,0 +1,11 @@
+---
+- name: Установка и настройка c-agent
+  hosts: target_machines
+  become: yes
+
+  vars:
+    hostlist: target_machines
+
+  roles:
+    - role: c-agent_install
+      tags: [c_agent, install, config, service]

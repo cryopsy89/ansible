@@ -1,0 +1,5 @@
+- name: Остановить контейнер
+  shell: docker stop {{ container_name }}
+  register: stop_output
+  changed_when: "'is not running' not in stop_output.stdout"
+  tags: stop

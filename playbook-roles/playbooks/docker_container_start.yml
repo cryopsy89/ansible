@@ -1,0 +1,7 @@
+---
+- name: Перезапуск контейнера Docker #Измени строку container_name в docker_container_start/Defaults/main.yml
+  hosts: target_machines
+  become: true
+  gather_facts: false
+  roles:
+    - docker_container_start

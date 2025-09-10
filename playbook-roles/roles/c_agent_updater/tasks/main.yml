@@ -1,0 +1,101 @@
+---
+- name: Получаем текущую версию c-agent
+  ansible.builtin.command: rpm -q --queryformat '%{VERSION}' c-agent
+  register: current_version
+  ignore_errors: yes
+  changed_when: false
+  tags: version_check
+
+- name: Получаем версию из нового RPM
+  ansible.builtin.command: rpm -qp --queryformat '%{VERSION}' "{{ agent_rpm_src }}"
+  register: new_version
+  delegate_to: localhost
+  become: no
+  changed_when: false
+  tags: version_check
+
+- name: Проверяем необходимость обновления
+  ansible.builtin.set_fact:
+    need_update: >-
+      {{
+        (current_version.rc != 0) or
+        (
+          (current_version.stdout is defined) and
+          (new_version.stdout is defined) and
+          (new_version.stdout is version(current_version.stdout, '>'))
+        )
+      }}
+  tags: version_check
+
+- name: Выводим информацию о версиях
+  ansible.builtin.debug:
+    msg: |
+      Текущая версия: {{ current_version.stdout | default('не установлена') }}
+      Новая версия: {{ new_version.stdout }}
+      Необходимо обновление: {{ need_update }}
+  tags: version_check
+
+- name: Остановить службу c-agent (если требуется обновление)
+  ansible.builtin.service:
+    name: c-agent
+    state: stopped
+  when: need_update
+  tags: stop_service
+
+- name: Удаляем пакет c-agent (если требуется обновление)
+  ansible.builtin.package:
+    name: c-agent
+    state: absent
+  register: uninstall_result
+  ignore_errors: yes
+  when: need_update
+  tags: remove_package
+
+- name: Копируем c-agent на целевую машину
+  ansible.builtin.copy:
+    src: "{{ agent_rpm_src }}"
+    dest: "{{ agent_rpm_dest }}"
+    mode: '0644'
+  tags: install
+
+- name: Устанавливаем RPM пакет (если требуется обновление)
+  ansible.builtin.command:
+    cmd: rpm -i --nosignature {{ agent_rpm_dest }}
+  register: rpm_install
+  ignore_errors: yes
+  when: need_update
+  notify: restart c-agent
+  tags: install
+
+- name: Удаление старого конфига (гарантированная замена)
+  ansible.builtin.file:
+    path: "{{ c_agent_config_dest }}"
+    state: absent
+  ignore_errors: yes
+  tags: config_cleanup
+
+- name: Копирование новой конфигурации с заменой
+  ansible.builtin.copy:
+    src: "{{ c_agent_config_src }}"
+    dest: "{{ c_agent_config_dest }}"
+    owner: "{{ c_agent_user }}"
+    group: "{{ c_agent_group }}"
+    mode: '0644'
+    force: yes
+    backup: yes 
+  notify: restart c-agent
+  tags: config
+
+- name: Запускаем службу c-agent (если было обновление)
+  ansible.builtin.service:
+    name: c-agent
+    state: started
+    enabled: yes
+  when: need_update
+  tags: start_service
+
+- name: Сообщаем если обновление не требуется
+  ansible.builtin.debug:
+    msg: "Текущая версия {{ current_version.stdout }} новее или равна {{ new_version.stdout }} - обновление не требуется"
+  when: not need_update
+  tags: version_check

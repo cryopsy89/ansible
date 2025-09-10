@@ -1,0 +1,7 @@
+---
+- name: Deploy or update metric-collector
+  hosts: target_machines
+  become: yes
+  roles:
+    - deploy_metric_collector
+

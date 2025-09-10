@@ -1,0 +1,5 @@
+---
+agent_rpm_src: /etc/ansible/roles/c-agent_install/files/c-agent-25.2.0-1.x86_64.rpm
+agent_rpm_dest: /tmp/c-agent.rpm
+agent_config_src: /etc/ansible/roles/c-agent_install/files/agent-config.json
+agent_config_dest: /opt/c-agent/agent-config.json
