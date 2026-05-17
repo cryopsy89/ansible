@@ -1,0 +1,7 @@
+---
+- name: Развертывание gitlab runner
+  hosts: targets
+  become: true
+
+  roles:
+  - gitlab-runners-deploy

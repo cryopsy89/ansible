@@ -1,0 +1,7 @@
+---
+- name: Развертывание gitlab на целевой машине
+  hosts: targets
+  become: true
+
+  roles:
+  - gitlab-deploy

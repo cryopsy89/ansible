@@ -1,0 +1,55 @@
+---
+#Проверим не установлен ли уже gitlab в системе
+- name: Проверка установленного gitlab
+  ansible.builtin.package_facts: 
+    manager:
+      - auto
+
+- name: Проверка наличия gitlab
+  ansible.builtin.set_fact:
+    gitlab_installed: "{{'gitlab-ce' in ansible_facts.packages or 'gitlab-ee' in ansible_facts.packages}}"
+
+- name: Gitlab уже установлен
+  ansible.builtin.debug:
+    msg: "Gitlab already installed on {{ ansible_hostname }}."
+  when: gitlab_installed | bool
+
+#Если gitlab отсутствует переходим к установке
+- name: Установка Gitlab
+  block:
+    - name: Добавляем репозиторий Gitlab
+      ansible.builtin.get_url: 
+        url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
+        dest: /tmp/gitlab-repo-script.sh
+        mode: '0755'
+
+    - name: Выполняем скрипт добавления репозитория
+      ansible.builtin.command: /tmp/gitlab-repo-script.sh
+      args: 
+        creates: /etc/apt/sources.list.d/gitlab_gitlab-ce.list
+
+    - name: Устанавливаем Gitlab
+      ansible.builtin.apt:
+        name: gitlab-ce
+        state: present
+        update_cache: yes
+
+    - name: Запустить первоначальную конфигурацию
+      ansible.builtin.command: gitlab-ctl reconfigure
+
+    - name: Читаем пароль root по умолчанию для gitlab
+      ansible.builtin.slurp:
+        src: /etc/gitlab/initial_root_password
+      register: password_file
+
+    - name: Выводим пароль root
+      ansible.builtin.debug:
+        msg: "Пароль root: {{ password_file['content'] | b64decode | regex_search('Password: (.+)', '\\1') | first }}"
+  rescue:
+    - name: Сообщение в случае ошибки установки
+      ansible.builtin.debug:
+        msg: "Установка Gitlab завершилась с ошибкой!"
+  when: not gitlab_installed | bool
+
+
+
